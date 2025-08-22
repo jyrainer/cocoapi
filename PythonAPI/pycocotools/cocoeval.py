@@ -456,32 +456,35 @@ class COCOeval:
             print(iStr.format(titleStr, typeStr, iouStr, areaRng, maxDets, mean_s))
             return mean_s
         def _summarizeDets():
-            stats = np.zeros((12,))
-            stats[0] = _summarize(1)
-            stats[1] = _summarize(1, iouThr=.5, maxDets=self.params.maxDets[2])
-            stats[2] = _summarize(1, iouThr=.75, maxDets=self.params.maxDets[2])
-            stats[3] = _summarize(1, areaRng='small', maxDets=self.params.maxDets[2])
-            stats[4] = _summarize(1, areaRng='medium', maxDets=self.params.maxDets[2])
-            stats[5] = _summarize(1, areaRng='large', maxDets=self.params.maxDets[2])
-            stats[6] = _summarize(0, maxDets=self.params.maxDets[0])
-            stats[7] = _summarize(0, maxDets=self.params.maxDets[1])
-            stats[8] = _summarize(0, maxDets=self.params.maxDets[2])
-            stats[9] = _summarize(0, areaRng='small', maxDets=self.params.maxDets[2])
-            stats[10] = _summarize(0, areaRng='medium', maxDets=self.params.maxDets[2])
-            stats[11] = _summarize(0, areaRng='large', maxDets=self.params.maxDets[2])
+            stats = np.zeros((128,))
+            AP_AR_list = [1, 0]
+            areaRng = ['all', 'small', 'medium', 'large']
+            maxDets_list = [100]
+            iouThr_list = [.5, .75, None] # None is 50:95
+            
+            i = 0
+            for ap_ar in AP_AR_list:
+                for area in areaRng:
+                    for maxDet in maxDets_list:
+                        for iouThr in iouThr_list:
+                            stats[i] = _summarize(ap=ap_ar, iouThr=iouThr, areaRng=area, maxDets=maxDet)
+                            i += 1
+
             return stats
         def _summarizeKps():
-            stats = np.zeros((10,))
-            stats[0] = _summarize(1, maxDets=20)
-            stats[1] = _summarize(1, maxDets=20, iouThr=.5)
-            stats[2] = _summarize(1, maxDets=20, iouThr=.75)
-            stats[3] = _summarize(1, maxDets=20, areaRng='medium')
-            stats[4] = _summarize(1, maxDets=20, areaRng='large')
-            stats[5] = _summarize(0, maxDets=20)
-            stats[6] = _summarize(0, maxDets=20, iouThr=.5)
-            stats[7] = _summarize(0, maxDets=20, iouThr=.75)
-            stats[8] = _summarize(0, maxDets=20, areaRng='medium')
-            stats[9] = _summarize(0, maxDets=20, areaRng='large')
+            stats = np.zeros((128,))
+            AP_AR_list = [1, 0]
+            areaRng = ['all', 'medium', 'large']
+            maxDets_list = [20]
+            iouThr_list = [.5, .75, None]
+            i = 0
+            for ap_ar in AP_AR_list:
+                for area in areaRng:
+                    for maxDet in maxDets_list:
+                        for iouThr in iouThr_list:
+                            stats[i] = _summarize(ap=ap_ar, iouThr=iouThr, areaRng=area, maxDets=maxDet)
+                            i += 1
+
             return stats
         if not self.eval:
             raise Exception('Please run accumulate() first')
